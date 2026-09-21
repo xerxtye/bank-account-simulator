@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BankAccountApi.Models;
+using Microsoft.IdentityModel.Tokens;
 
 namespace BankAccountApi.Controllers;
 
@@ -23,15 +24,15 @@ public class BankAccountItemsController : ControllerBase
             .Select(x => ItemToDTO(x))
             .ToListAsync();
     }
-
-    // // GET: api/test
-    // [HttpGet]
-    // public async Task<ActionResult<IEnumerable<BankAccountItemDTO>>> GetTest()
-    // {
-    //     return await _context.BankAccountItems
-    //         .Select(x => ItemToDTO(x))
-    //         .ToListAsync();
-    // }
+    
+    [HttpGet("name/{name:alpha}")]
+    public async Task<ActionResult<IEnumerable<BankAccountItemDTO>>> GetBankAccountByName(string name)
+    {
+        return await _context.BankAccountItems
+            .Where(p => p.Name.Equals(name))
+            .Select(x => ItemToDTO(x))
+            .ToListAsync();
+    }
 
     
     // GET: api/BankAccountItems/5
@@ -39,14 +40,14 @@ public class BankAccountItemsController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<BankAccountItemDTO>> GetBankAccountItem(long id)
     {
-        var todoItem = await _context.BankAccountItems.FindAsync(id);
+        var bankAccountItem = await _context.BankAccountItems.FindAsync(id);
 
-        if (todoItem == null)
+        if (bankAccountItem == null)
         {
             return NotFound();
         }
 
-        return ItemToDTO(todoItem);
+        return ItemToDTO(bankAccountItem);
     }
     // </snippet_GetByID>p
 
@@ -54,21 +55,21 @@ public class BankAccountItemsController : ControllerBase
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     // <snippet_Update>
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutBankAccountItem(long id, BankAccountItemDTO todoDTO)
+    public async Task<IActionResult> PutBankAccountItem(long id, BankAccountItemDTO bankAccountDTO)
     {
-        if (id != todoDTO.Id)
+        if (id != bankAccountDTO.Id)
         {
             return BadRequest();
         }
 
-        var todoItem = await _context.BankAccountItems.FindAsync(id);
-        if (todoItem == null)
+        var bankAccountItem = await _context.BankAccountItems.FindAsync(id);
+        if (bankAccountItem == null)
         {
             return NotFound();
         }
 
-        todoItem.Name = todoDTO.Name;
-        todoItem.IsComplete = todoDTO.IsComplete;
+        bankAccountItem.Name = bankAccountDTO.Name;
+        bankAccountItem.IsComplete = bankAccountDTO.IsComplete;
 
         try
         {
@@ -87,21 +88,21 @@ public class BankAccountItemsController : ControllerBase
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     // <snippet_Create>
     [HttpPost]
-    public async Task<ActionResult<BankAccountItemDTO>> PostBankAccountItem(BankAccountItemDTO todoDTO)
+    public async Task<ActionResult<BankAccountItemDTO>> PostBankAccountItem(BankAccountItemDTO bankAccountDTO)
     {
-        var todoItem = new BankAccountItem
+        var bankAccountItem = new BankAccountItem
         {
-            IsComplete = todoDTO.IsComplete,
-            Name = todoDTO.Name
+            IsComplete = bankAccountDTO.IsComplete,
+            Name = bankAccountDTO.Name
         };
 
-        _context.BankAccountItems.Add(todoItem);
+        _context.BankAccountItems.Add(bankAccountItem);
         await _context.SaveChangesAsync();
 
         return CreatedAtAction(
             nameof(GetBankAccountItem),
-            new { id = todoItem.Id },
-            ItemToDTO(todoItem));
+            new { id = bankAccountItem.Id },
+            ItemToDTO(bankAccountItem));
     }
     // </snippet_Create>
 
@@ -109,13 +110,13 @@ public class BankAccountItemsController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteBankAccountItem(long id)
     {
-        var todoItem = await _context.BankAccountItems.FindAsync(id);
-        if (todoItem == null)
+        var bankAccountItem = await _context.BankAccountItems.FindAsync(id);
+        if (bankAccountItem == null)
         {
             return NotFound();
         }
 
-        _context.BankAccountItems.Remove(todoItem);
+        _context.BankAccountItems.Remove(bankAccountItem);
         await _context.SaveChangesAsync();
 
         return NoContent();
@@ -126,11 +127,11 @@ public class BankAccountItemsController : ControllerBase
         return _context.BankAccountItems.Any(e => e.Id == id);
     }
 
-    private static BankAccountItemDTO ItemToDTO(BankAccountItem todoItem) =>
+    private static BankAccountItemDTO ItemToDTO(BankAccountItem bankAccountItem) =>
        new BankAccountItemDTO
        {
-           Id = todoItem.Id,
-           Name = todoItem.Name,
-           IsComplete = todoItem.IsComplete
+           Id = bankAccountItem.Id,
+           Name = bankAccountItem.Name,
+           IsComplete = bankAccountItem.IsComplete
        };
 }
