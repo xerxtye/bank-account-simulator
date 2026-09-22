@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BankAccountApi.Models;
 using Microsoft.IdentityModel.Tokens;
@@ -24,7 +24,7 @@ public class BankAccountItemsController : ControllerBase
             .Select(x => ItemToDTO(x))
             .ToListAsync();
     }
-    
+
     [HttpGet("name/{name:alpha}")]
     public async Task<ActionResult<IEnumerable<BankAccountItemDTO>>> GetBankAccountByName(string name)
     {
@@ -34,11 +34,10 @@ public class BankAccountItemsController : ControllerBase
             .ToListAsync();
     }
 
-    
     // GET: api/BankAccountItems/5
     // <snippet_GetByID>
-    [HttpGet("{id}")]
-    public async Task<ActionResult<BankAccountItemDTO>> GetBankAccountItem(long id)
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<BankAccountItemDTO>> GetBankAccountItem(int id)
     {
         var bankAccountItem = await _context.BankAccountItems.FindAsync(id);
 
@@ -54,8 +53,8 @@ public class BankAccountItemsController : ControllerBase
     // PUT: api/BankAccountItems/5
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     // <snippet_Update>
-    [HttpPut("{id}")]
-    public async Task<IActionResult> PutBankAccountItem(long id, BankAccountItemDTO bankAccountDTO)
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> PutBankAccountItem(int id, BankAccountItemDTO bankAccountDTO)
     {
         if (id != bankAccountDTO.Id)
         {
@@ -69,7 +68,7 @@ public class BankAccountItemsController : ControllerBase
         }
 
         bankAccountItem.Name = bankAccountDTO.Name;
-        bankAccountItem.IsComplete = bankAccountDTO.IsComplete;
+        bankAccountItem.Balance = bankAccountDTO.Balance;
 
         try
         {
@@ -92,8 +91,8 @@ public class BankAccountItemsController : ControllerBase
     {
         var bankAccountItem = new BankAccountItem
         {
-            IsComplete = bankAccountDTO.IsComplete,
-            Name = bankAccountDTO.Name
+            Name = bankAccountDTO.Name,
+            Balance = bankAccountDTO.Balance
         };
 
         _context.BankAccountItems.Add(bankAccountItem);
@@ -107,8 +106,8 @@ public class BankAccountItemsController : ControllerBase
     // </snippet_Create>
 
     // DELETE: api/BankAccountItems/5
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteBankAccountItem(long id)
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> DeleteBankAccountItem(int id)
     {
         var bankAccountItem = await _context.BankAccountItems.FindAsync(id);
         if (bankAccountItem == null)
@@ -122,7 +121,7 @@ public class BankAccountItemsController : ControllerBase
         return NoContent();
     }
 
-    private bool BankAccountItemExists(long id)
+    private bool BankAccountItemExists(int id)
     {
         return _context.BankAccountItems.Any(e => e.Id == id);
     }
@@ -132,6 +131,6 @@ public class BankAccountItemsController : ControllerBase
        {
            Id = bankAccountItem.Id,
            Name = bankAccountItem.Name,
-           IsComplete = bankAccountItem.IsComplete
+           Balance = bankAccountItem.Balance,
        };
 }
