@@ -1,7 +1,6 @@
-    using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BankAccountApi.Models;
-using Microsoft.IdentityModel.Tokens;
 
 namespace BankAccountApi.Controllers;
 

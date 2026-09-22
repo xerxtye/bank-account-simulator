@@ -8,8 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
-builder.Services.AddDbContext<BankAccountContext>(opt =>
-    opt.UseInMemoryDatabase("BankAccountList"));
+builder.Services.AddDbContext<BankAccountContext>();
 
 var app = builder.Build();
 
