@@ -1,14 +1,19 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi;
 using BankAccountApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddDbContext<BankAccountContext>();
+builder.Services.AddAuthentication(o => 
+{
+   o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+   o.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+});
+
 
 var app = builder.Build();
 

@@ -47,7 +47,7 @@ public class BankAccountItemsController : ControllerBase
 
         return ItemToDTO(bankAccountItem);
     }
-    // </snippet_GetByID>p
+    // </snippet_GetByID>
 
     // PUT: api/BankAccountItems/5
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -67,7 +67,6 @@ public class BankAccountItemsController : ControllerBase
         }
 
         bankAccountItem.Name = bankAccountDTO.Name;
-        bankAccountItem.Balance = bankAccountDTO.Balance;
 
         try
         {
@@ -90,8 +89,7 @@ public class BankAccountItemsController : ControllerBase
     {
         var bankAccountItem = new BankAccountItem
         {
-            Name = bankAccountDTO.Name,
-            Balance = bankAccountDTO.Balance
+            Name = bankAccountDTO.Name
         };
 
         _context.BankAccountItems.Add(bankAccountItem);
@@ -130,6 +128,5 @@ public class BankAccountItemsController : ControllerBase
        {
            Id = bankAccountItem.Id,
            Name = bankAccountItem.Name,
-           Balance = bankAccountItem.Balance,
        };
 }
