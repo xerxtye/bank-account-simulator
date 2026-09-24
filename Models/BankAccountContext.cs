@@ -6,8 +6,10 @@ namespace BankAccountApi.Models;
 
 public class BankAccountContext : DbContext
 {
-    protected override void OnConfiguring(DbContextOptionsBuilder options) {
-        var connectionString = "Host=localhost;Database=bankdb;Username=postgres;Password=";
+    protected override void OnConfiguring(DbContextOptionsBuilder options)
+    {
+        var builder = WebApplication.CreateBuilder();
+        var connectionString = builder.Configuration["BankAccountContext:connectionString"];
         options.UseNpgsql(connectionString);
     }
     

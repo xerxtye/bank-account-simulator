@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BankAccountApi.Migrations
 {
     [DbContext(typeof(BankAccountContext))]
-    [Migration("20260922164520_InitialCreate")]
+    [Migration("20260924114045_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -38,7 +38,7 @@ namespace BankAccountApi.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
-                    b.Property<string>("Secret")
+                    b.Property<string>("Password")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
