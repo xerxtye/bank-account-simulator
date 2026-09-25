@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BankAccountApi.Models;
+using BankAccountApi.Services;
 
 namespace BankAccountApi.Controllers;
 
@@ -8,50 +9,50 @@ namespace BankAccountApi.Controllers;
 [ApiController]
 public class BankAccountItemsController : ControllerBase
 {
-    private readonly BankAccountContext _context;
+    private readonly IBankAccountItemService _bankAccountItemService;
 
-    public BankAccountItemsController(BankAccountContext context)
+    public BankAccountItemsController(IBankAccountItemService bankAccountItemService)
     {
-        _context = context;
+        _bankAccountItemService = bankAccountItemService;
     }
 
     // GET: api/BankAccountItems
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<BankAccountItemDTO>>> GetBankAccountItems()
+    public async Task<ActionResult<IEnumerable<BankAccountItemDTO>>> GetAllBankAccountItems()
     {
-        return await _context.BankAccountItems
-            .Select(x => ItemToDTO(x))
-            .ToListAsync();
+        return Ok(await _bankAccountItemService.GetAllBankAccountItems());
     }
 
     [HttpGet("name/{name:alpha}")]
     public async Task<ActionResult<IEnumerable<BankAccountItemDTO>>> GetBankAccountByName(string name)
     {
-        return await _context.BankAccountItems
-            .Where(p => p.Name.Equals(name))
-            .Select(x => ItemToDTO(x))
-            .ToListAsync();
+        return Ok(await _bankAccountItemService.GetBankAccountByName(name));
     }
 
     // GET: api/BankAccountItems/5
-    // <snippet_GetByID>
     [HttpGet("{id:int}")]
     public async Task<ActionResult<BankAccountItemDTO>> GetBankAccountItem(int id)
     {
-        var bankAccountItem = await _context.BankAccountItems.FindAsync(id);
+        var bankAccountItem = await _bankAccountItemService.GetBankAccountItemById(id);
+        if (bankAccountItem == null) return NotFound();
 
-        if (bankAccountItem == null)
-        {
-            return NotFound();
-        }
-
-        return ItemToDTO(bankAccountItem);
+        return Ok(bankAccountItem);
     }
-    // </snippet_GetByID>
+    
+    // POST: api/BankAccountItems
+    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+    [HttpPost]
+    public async Task<ActionResult<BankAccountItemDTO>> PostBankAccountItem(BankAccountItemDTO bankAccountDTO)
+    {
+        var createdBankAccountItem = await _bankAccountItemService.CreateBankAccountItem(bankAccountDTO);
+        return CreatedAtAction(
+            nameof(GetBankAccountItem),
+            new { id = createdBankAccountItem.Id },
+            createdBankAccountItem);            
+    }
 
     // PUT: api/BankAccountItems/5
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-    // <snippet_Update>
     [HttpPut("{id:int}")]
     public async Task<IActionResult> PutBankAccountItem(int id, BankAccountItemDTO bankAccountDTO)
     {
@@ -59,74 +60,25 @@ public class BankAccountItemsController : ControllerBase
         {
             return BadRequest();
         }
-
-        var bankAccountItem = await _context.BankAccountItems.FindAsync(id);
-        if (bankAccountItem == null)
-        {
-            return NotFound();
-        }
-
-        bankAccountItem.Name = bankAccountDTO.Name;
-
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException) when (!BankAccountItemExists(id))
+        
+        if (!(await _bankAccountItemService.UpdateBankAccountItem(id, bankAccountDTO)))
         {
             return NotFound();
         }
 
         return NoContent();
     }
-    // </snippet_Update>
 
-    // POST: api/BankAccountItems
-    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-    // <snippet_Create>
-    [HttpPost]
-    public async Task<ActionResult<BankAccountItemDTO>> PostBankAccountItem(BankAccountItemDTO bankAccountDTO)
-    {
-        var bankAccountItem = new BankAccountItem
-        {
-            Name = bankAccountDTO.Name
-        };
-
-        _context.BankAccountItems.Add(bankAccountItem);
-        await _context.SaveChangesAsync();
-
-        return CreatedAtAction(
-            nameof(GetBankAccountItem),
-            new { id = bankAccountItem.Id },
-            ItemToDTO(bankAccountItem));
-    }
-    // </snippet_Create>
 
     // DELETE: api/BankAccountItems/5
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteBankAccountItem(int id)
     {
-        var bankAccountItem = await _context.BankAccountItems.FindAsync(id);
-        if (bankAccountItem == null)
+        if (!(await _bankAccountItemService.DeleteBankAccountItem(id)))
         {
             return NotFound();
         }
 
-        _context.BankAccountItems.Remove(bankAccountItem);
-        await _context.SaveChangesAsync();
-
         return NoContent();
     }
-
-    private bool BankAccountItemExists(int id)
-    {
-        return _context.BankAccountItems.Any(e => e.Id == id);
-    }
-
-    private static BankAccountItemDTO ItemToDTO(BankAccountItem bankAccountItem) =>
-       new BankAccountItemDTO
-       {
-           Id = bankAccountItem.Id,
-           Name = bankAccountItem.Name,
-       };
 }
