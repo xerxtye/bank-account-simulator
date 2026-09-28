@@ -1,4 +1,4 @@
-namespace BankAccountApi.Exceptions;
+namespace BankAccountApi.Security.Exceptions;
 
 public abstract class ApiException : Exception
 {
@@ -21,10 +21,26 @@ public sealed class BadRequestException : ApiException
     }
 }
 
+public sealed class UnauthorizedException : ApiException
+{
+    public UnauthorizedException(string message)
+        : base(StatusCodes.Status401Unauthorized, "Unauthorized", message)
+    {
+    }
+}
+
 public sealed class NotFoundException : ApiException
 {
     public NotFoundException(string message)
         : base(StatusCodes.Status404NotFound, "Resource not found", message)
+    {
+    }
+}
+
+public sealed class ConflictException : ApiException
+{
+    public ConflictException(string message)
+        : base(StatusCodes.Status409Conflict, "Conflict", message)
     {
     }
 }

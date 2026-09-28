@@ -1,8 +1,8 @@
-using BankAccountApi.Exceptions;
+using BankAccountApi.Security.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BankAccountApi.Middleware;
+namespace BankAccountApi.Security.Middleware;
 
 public sealed class GlobalExceptionHandler : IExceptionHandler
 {

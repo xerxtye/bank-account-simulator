@@ -34,13 +34,13 @@ public class BankAccountItemsController : ControllerBase
     {
         return Ok(await _bankAccountItemService.GetBankAccountItemById(id));
     }
-    
+
     // POST: api/BankAccountItems
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPost]
     public async Task<ActionResult<BankAccountItemDTO>> PostBankAccountItem(BankAccountItemDTO bankAccountDTO)
     {
-        return Ok(await _bankAccountItemService.CreateBankAccountItem(bankAccountDTO));            
+        return Ok(await _bankAccountItemService.CreateBankAccountItem(bankAccountDTO));
     }
 
     // PUT: api/BankAccountItems/5

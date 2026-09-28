@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using BankAccountApi.Exceptions;
+using BankAccountApi.Security.Exceptions;
 using BankAccountApi.Models;
 
 namespace BankAccountApi.Services;
@@ -95,5 +95,3 @@ public class BankAccountItemService : IBankAccountItemService
             Balance = bankAccountItem.Balance
         };
 }
-
-
