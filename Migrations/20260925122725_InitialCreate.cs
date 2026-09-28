@@ -19,7 +19,9 @@ namespace BankAccountApi.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: true),
                     Balance = table.Column<long>(type: "bigint", nullable: false),
-                    Password = table.Column<string>(type: "text", nullable: true)
+                    Password = table.Column<string>(type: "text", nullable: true),
+                    Secret = table.Column<string>(type: "text", nullable: true),
+                    Tmp = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {

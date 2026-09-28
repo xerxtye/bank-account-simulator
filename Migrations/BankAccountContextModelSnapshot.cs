@@ -38,9 +38,15 @@ namespace BankAccountApi.Migrations
                     b.Property<string>("Password")
                         .HasColumnType("text");
 
+                    b.Property<string>("Secret")
+                        .HasColumnType("text");
+
+                    b.Property<long>("Tmp")
+                        .HasColumnType("bigint");
+
                     b.HasKey("Id");
 
-                    b.ToTable("BankAccountItems");
+                    b.ToTable("BankAccountItems", (string)null);
                 });
 #pragma warning restore 612, 618
         }

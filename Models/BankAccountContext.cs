@@ -12,7 +12,7 @@ public class BankAccountContext : DbContext
         var connectionString = builder.Configuration["BankAccountContext:connectionString"];
         options.UseNpgsql(connectionString);
     }
-    
+
     public BankAccountContext(DbContextOptions<BankAccountContext> options)
         : base(options)
     {

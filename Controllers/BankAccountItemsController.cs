@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using BankAccountApi.Models;
 using BankAccountApi.Services;
 
@@ -33,10 +32,7 @@ public class BankAccountItemsController : ControllerBase
     [HttpGet("{id:int}")]
     public async Task<ActionResult<BankAccountItemDTO>> GetBankAccountItem(int id)
     {
-        var bankAccountItem = await _bankAccountItemService.GetBankAccountItemById(id);
-        if (bankAccountItem == null) return NotFound();
-
-        return Ok(bankAccountItem);
+        return Ok(await _bankAccountItemService.GetBankAccountItemById(id));
     }
     
     // POST: api/BankAccountItems
@@ -44,11 +40,7 @@ public class BankAccountItemsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<BankAccountItemDTO>> PostBankAccountItem(BankAccountItemDTO bankAccountDTO)
     {
-        var createdBankAccountItem = await _bankAccountItemService.CreateBankAccountItem(bankAccountDTO);
-        return CreatedAtAction(
-            nameof(GetBankAccountItem),
-            new { id = createdBankAccountItem.Id },
-            createdBankAccountItem);            
+        return Ok(await _bankAccountItemService.CreateBankAccountItem(bankAccountDTO));            
     }
 
     // PUT: api/BankAccountItems/5
@@ -56,17 +48,8 @@ public class BankAccountItemsController : ControllerBase
     [HttpPut("{id:int}")]
     public async Task<IActionResult> PutBankAccountItem(int id, BankAccountItemDTO bankAccountDTO)
     {
-        if (id != bankAccountDTO.Id)
-        {
-            return BadRequest();
-        }
-        
-        if (!(await _bankAccountItemService.UpdateBankAccountItem(id, bankAccountDTO)))
-        {
-            return NotFound();
-        }
-
-        return NoContent();
+        await _bankAccountItemService.UpdateBankAccountItem(id, bankAccountDTO);
+        return Ok();
     }
 
 
@@ -74,11 +57,7 @@ public class BankAccountItemsController : ControllerBase
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteBankAccountItem(int id)
     {
-        if (!(await _bankAccountItemService.DeleteBankAccountItem(id)))
-        {
-            return NotFound();
-        }
-
-        return NoContent();
+        await _bankAccountItemService.DeleteBankAccountItem(id);
+        return Ok();
     }
 }
