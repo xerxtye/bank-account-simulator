@@ -25,4 +25,4 @@ public sealed record AuthResponse(
     string TokenType,
     DateTime ExpiresAtUtc);
 
-public sealed record RegisteredUserResponse(int Id, string Username);
+public sealed record RegisteredUserResponse(long Id, string Username);

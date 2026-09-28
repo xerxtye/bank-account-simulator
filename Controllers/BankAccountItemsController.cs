@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using BankAccountApi.Models;
 using BankAccountApi.Services;
 
 namespace BankAccountApi.Controllers;
 
+[Authorize]
 [Route("api/[controller]")]
 [ApiController]
 public class BankAccountItemsController : ControllerBase
@@ -29,8 +31,8 @@ public class BankAccountItemsController : ControllerBase
     }
 
     // GET: api/BankAccountItems/5
-    [HttpGet("{id:int}")]
-    public async Task<ActionResult<BankAccountItemDTO>> GetBankAccountItem(int id)
+    [HttpGet("{id:long}")]
+    public async Task<ActionResult<BankAccountItemDTO>> GetBankAccountItem(long id)
     {
         return Ok(await _bankAccountItemService.GetBankAccountItemById(id));
     }
@@ -45,8 +47,8 @@ public class BankAccountItemsController : ControllerBase
 
     // PUT: api/BankAccountItems/5
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-    [HttpPut("{id:int}")]
-    public async Task<IActionResult> PutBankAccountItem(int id, BankAccountItemDTO bankAccountDTO)
+    [HttpPut("{id:long}")]
+    public async Task<IActionResult> PutBankAccountItem(long id, BankAccountItemDTO bankAccountDTO)
     {
         await _bankAccountItemService.UpdateBankAccountItem(id, bankAccountDTO);
         return Ok();
@@ -54,8 +56,8 @@ public class BankAccountItemsController : ControllerBase
 
 
     // DELETE: api/BankAccountItems/5
-    [HttpDelete("{id:int}")]
-    public async Task<IActionResult> DeleteBankAccountItem(int id)
+    [HttpDelete("{id:long}")]
+    public async Task<IActionResult> DeleteBankAccountItem(long id)
     {
         await _bankAccountItemService.DeleteBankAccountItem(id);
         return Ok();

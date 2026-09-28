@@ -30,8 +30,11 @@ if (string.IsNullOrWhiteSpace(connectionString))
 builder.Services.AddDbContext<BankAccountContext>(options =>
     options.UseNpgsql(connectionString));
 builder.Services.AddScoped<IBankAccountItemService, BankAccountItemService>();
+builder.Services.AddScoped<IBalanceService, BalanceService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPasswordHasher<AppUser>, PasswordHasher<AppUser>>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 
 var jwtSection = builder.Configuration.GetSection(JwtOptions.SectionName);
 var jwtOptions = jwtSection.Get<JwtOptions>()

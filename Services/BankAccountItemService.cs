@@ -28,7 +28,7 @@ public class BankAccountItemService : IBankAccountItemService
             .ToListAsync();
     }
 
-    public async Task<BankAccountItemDTO> GetBankAccountItemById(int id)
+    public async Task<BankAccountItemDTO> GetBankAccountItemById(long id)
     {
         var bankAccountItem = await _context.BankAccountItems.FindAsync(id)
             ?? throw new NotFoundException($"Bank account item with ID {id} was not found.");
@@ -40,8 +40,7 @@ public class BankAccountItemService : IBankAccountItemService
     {
         var bankAccountItem = new BankAccountItem
         {
-            Name = bankAccountDTO.Name,
-            Balance = bankAccountDTO.Balance
+            Name = bankAccountDTO.Name
         };
 
         _context.BankAccountItems.Add(bankAccountItem);
@@ -50,7 +49,7 @@ public class BankAccountItemService : IBankAccountItemService
         return ItemToDTO(bankAccountItem);
     }
 
-    public async Task UpdateBankAccountItem(int id, BankAccountItemDTO bankAccountDTO)
+    public async Task UpdateBankAccountItem(long id, BankAccountItemDTO bankAccountDTO)
     {
         if (id != bankAccountDTO.Id)
         {
@@ -61,7 +60,6 @@ public class BankAccountItemService : IBankAccountItemService
             ?? throw new NotFoundException($"Bank account item with ID {id} was not found.");
 
         bankAccountItem.Name = bankAccountDTO.Name;
-        bankAccountItem.Balance = bankAccountDTO.Balance;
 
         try
         {
@@ -73,7 +71,7 @@ public class BankAccountItemService : IBankAccountItemService
         }
     }
 
-    public async Task DeleteBankAccountItem(int id)
+    public async Task DeleteBankAccountItem(long id)
     {
         var bankAccountItem = await _context.BankAccountItems.FindAsync(id)
             ?? throw new NotFoundException($"Bank account item with ID {id} was not found.");
@@ -82,7 +80,7 @@ public class BankAccountItemService : IBankAccountItemService
         await _context.SaveChangesAsync();
     }
 
-    private bool BankAccountItemExists(int id)
+    private bool BankAccountItemExists(long id)
     {
         return _context.BankAccountItems.Any(e => e.Id == id);
     }
@@ -91,7 +89,6 @@ public class BankAccountItemService : IBankAccountItemService
         new BankAccountItemDTO
         {
             Id = bankAccountItem.Id,
-            Name = bankAccountItem.Name,
-            Balance = bankAccountItem.Balance
+            Name = bankAccountItem.Name
         };
 }

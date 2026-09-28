@@ -14,6 +14,10 @@ public class BankAccountContext : DbContext
         modelBuilder.Entity<AppUser>()
             .HasIndex(user => user.NormalizedUsername)
             .IsUnique();
+
+        modelBuilder.Entity<AppUser>()
+            .Property(user => user.Balance)
+            .HasPrecision(18, 2);
     }
 
     public DbSet<BankAccountItem> BankAccountItems { get; set; } = null!;

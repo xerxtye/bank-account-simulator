@@ -5,10 +5,10 @@ namespace BankAccountApi.Services
     public interface IBankAccountItemService
     {
         Task<IEnumerable<BankAccountItemDTO>> GetAllBankAccountItems();
-        Task<BankAccountItemDTO> GetBankAccountItemById(int id);
+        Task<BankAccountItemDTO> GetBankAccountItemById(long id);
         Task<IEnumerable<BankAccountItemDTO>> GetBankAccountByName(string name);
         Task<BankAccountItemDTO> CreateBankAccountItem(BankAccountItemDTO bankAccountItemDTO);
-        Task UpdateBankAccountItem(int id, BankAccountItemDTO bankAccountItemDTO);
-        Task DeleteBankAccountItem(int id);
+        Task UpdateBankAccountItem(long id, BankAccountItemDTO bankAccountItemDTO);
+        Task DeleteBankAccountItem(long id);
     }
 }
