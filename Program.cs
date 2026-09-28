@@ -32,7 +32,7 @@ builder.Services.AddDbContext<BankAccountContext>(options =>
 builder.Services.AddScoped<IBankAccountItemService, BankAccountItemService>();
 builder.Services.AddScoped<IBalanceService, BalanceService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IPasswordHasher<AppUser>, PasswordHasher<AppUser>>();
+builder.Services.AddScoped<IPasswordHasher<BankAccountItem>, PasswordHasher<BankAccountItem>>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 

@@ -11,15 +11,14 @@ public class BankAccountContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<AppUser>()
-            .HasIndex(user => user.NormalizedUsername)
-            .IsUnique();
+        modelBuilder.Entity<BankAccountItem>()
+            .ToTable("Users");
 
-        modelBuilder.Entity<AppUser>()
-            .Property(user => user.Balance)
+
+        modelBuilder.Entity<BankAccountItem>()
+            .Property(account => account.Balance)
             .HasPrecision(18, 2);
     }
 
     public DbSet<BankAccountItem> BankAccountItems { get; set; } = null!;
-    public DbSet<AppUser> Users { get; set; } = null!;
 }

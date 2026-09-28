@@ -5,22 +5,20 @@ using BankAccountApi.Models;
 using BankAccountApi.Security;
 using BankAccountApi.Security.Exceptions;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Npgsql;
 
 namespace BankAccountApi.Services;
 
 public sealed class AuthService : IAuthService
 {
     private readonly BankAccountContext _context;
-    private readonly IPasswordHasher<AppUser> _passwordHasher;
+    private readonly IPasswordHasher<BankAccountItem> _passwordHasher;
     private readonly JwtOptions _jwtOptions;
 
     public AuthService(
         BankAccountContext context,
-        IPasswordHasher<AppUser> passwordHasher,
+        IPasswordHasher<BankAccountItem> passwordHasher,
         IOptions<JwtOptions> jwtOptions)
     {
         _context = context;
@@ -30,55 +28,40 @@ public sealed class AuthService : IAuthService
 
     public async Task<RegisteredUserResponse> Register(RegisterRequest request)
     {
-        var username = request.Username.Trim();
-        if (username.Length < 3)
+        var firstName = request.FirstName.Trim();
+        var lastName = request.LastName.Trim();
+        if (firstName.Length < 2 || lastName.Length < 2)
         {
-            throw new BadRequestException("Username must contain at least 3 non-whitespace characters.");
+            throw new BadRequestException(
+                "First name and last name must contain at least 2 non-whitespace characters.");
         }
 
-        var normalizedUsername = NormalizeUsername(username);
 
-        if (await _context.Users.AnyAsync(user => user.NormalizedUsername == normalizedUsername))
+        var user = new BankAccountItem
         {
-            throw new ConflictException("A user with this username already exists.");
-        }
-
-        var user = new AppUser
-        {
-            Username = username,
-            NormalizedUsername = normalizedUsername,
+            FirstName = firstName,
+            LastName = lastName,
             PasswordHash = string.Empty
         };
 
         user.PasswordHash = _passwordHasher.HashPassword(user, request.Password);
 
-        _context.Users.Add(user);
+        _context.BankAccountItems.Add(user);
+        await _context.SaveChangesAsync();
 
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateException exception)
-            when (exception.InnerException is PostgresException
-            {
-                SqlState: PostgresErrorCodes.UniqueViolation
-            })
-        {
-            throw new ConflictException("A user with this username already exists.");
-        }
-
-        return new RegisteredUserResponse(user.Id, user.Username);
+        return new RegisteredUserResponse(
+            user.Id,
+            user.FirstName,
+            user.LastName);
     }
 
     public async Task<AuthResponse> Login(LoginRequest request)
     {
-        var normalizedUsername = NormalizeUsername(request.Username);
-        var user = await _context.Users.SingleOrDefaultAsync(
-            candidate => candidate.NormalizedUsername == normalizedUsername);
+        var user = await _context.BankAccountItems.FindAsync(request.AccountId);
 
         if (user is null)
         {
-            throw new UnauthorizedException("Invalid username or password.");
+            throw new UnauthorizedException("Invalid account ID or password.");
         }
 
         var verificationResult = _passwordHasher.VerifyHashedPassword(
@@ -88,7 +71,7 @@ public sealed class AuthService : IAuthService
 
         if (verificationResult == PasswordVerificationResult.Failed)
         {
-            throw new UnauthorizedException("Invalid username or password.");
+            throw new UnauthorizedException("Invalid account ID or password.");
         }
 
         if (verificationResult == PasswordVerificationResult.SuccessRehashNeeded)
@@ -100,7 +83,7 @@ public sealed class AuthService : IAuthService
         return CreateToken(user);
     }
 
-    private AuthResponse CreateToken(AppUser user)
+    private AuthResponse CreateToken(BankAccountItem user)
     {
         var expiresAtUtc = DateTime.UtcNow.AddMinutes(_jwtOptions.ExpirationMinutes);
         var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.Secret));
@@ -108,7 +91,6 @@ public sealed class AuthService : IAuthService
         var claims = new[]
         {
             new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new Claim(JwtRegisteredClaimNames.UniqueName, user.Username),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
@@ -125,6 +107,4 @@ public sealed class AuthService : IAuthService
             expiresAtUtc);
     }
 
-    private static string NormalizeUsername(string username) =>
-        username.Trim().ToUpperInvariant();
 }

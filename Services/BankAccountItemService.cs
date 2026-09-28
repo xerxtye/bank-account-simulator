@@ -1,10 +1,10 @@
-using Microsoft.EntityFrameworkCore;
-using BankAccountApi.Security.Exceptions;
 using BankAccountApi.Models;
+using BankAccountApi.Security.Exceptions;
+using Microsoft.EntityFrameworkCore;
 
 namespace BankAccountApi.Services;
 
-public class BankAccountItemService : IBankAccountItemService
+public sealed class BankAccountItemService : IBankAccountItemService
 {
     private readonly BankAccountContext _context;
 
@@ -16,79 +16,24 @@ public class BankAccountItemService : IBankAccountItemService
     public async Task<IEnumerable<BankAccountItemDTO>> GetAllBankAccountItems()
     {
         return await _context.BankAccountItems
-            .Select(x => ItemToDTO(x))
+            .Select(account => ItemToDTO(account))
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<BankAccountItemDTO>> GetBankAccountByName(string name)
-    {
-        return await _context.BankAccountItems
-            .Where(p => p.Name == name)
-            .Select(x => ItemToDTO(x))
-            .ToListAsync();
-    }
 
     public async Task<BankAccountItemDTO> GetBankAccountItemById(long id)
     {
         var bankAccountItem = await _context.BankAccountItems.FindAsync(id)
-            ?? throw new NotFoundException($"Bank account item with ID {id} was not found.");
+            ?? throw new NotFoundException($"Bank account with ID {id} was not found.");
 
         return ItemToDTO(bankAccountItem);
-    }
-
-    public async Task<BankAccountItemDTO> CreateBankAccountItem(BankAccountItemDTO bankAccountDTO)
-    {
-        var bankAccountItem = new BankAccountItem
-        {
-            Name = bankAccountDTO.Name
-        };
-
-        _context.BankAccountItems.Add(bankAccountItem);
-        await _context.SaveChangesAsync();
-
-        return ItemToDTO(bankAccountItem);
-    }
-
-    public async Task UpdateBankAccountItem(long id, BankAccountItemDTO bankAccountDTO)
-    {
-        if (id != bankAccountDTO.Id)
-        {
-            throw new BadRequestException("The route ID must match the request body ID.");
-        }
-
-        var bankAccountItem = await _context.BankAccountItems.FindAsync(id)
-            ?? throw new NotFoundException($"Bank account item with ID {id} was not found.");
-
-        bankAccountItem.Name = bankAccountDTO.Name;
-
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException) when (!BankAccountItemExists(id))
-        {
-            throw new NotFoundException($"Bank account item with ID {id} was not found.");
-        }
-    }
-
-    public async Task DeleteBankAccountItem(long id)
-    {
-        var bankAccountItem = await _context.BankAccountItems.FindAsync(id)
-            ?? throw new NotFoundException($"Bank account item with ID {id} was not found.");
-
-        _context.BankAccountItems.Remove(bankAccountItem);
-        await _context.SaveChangesAsync();
-    }
-
-    private bool BankAccountItemExists(long id)
-    {
-        return _context.BankAccountItems.Any(e => e.Id == id);
     }
 
     private static BankAccountItemDTO ItemToDTO(BankAccountItem bankAccountItem) =>
-        new BankAccountItemDTO
+        new()
         {
             Id = bankAccountItem.Id,
-            Name = bankAccountItem.Name
+            FirstName = bankAccountItem.FirstName,
+            LastName = bankAccountItem.LastName
         };
 }

@@ -28,17 +28,17 @@ public sealed class BalanceService : IBalanceService
     {
         ValidateAmount(request.Amount);
 
-        var updatedRows = await _context.Users
-            .Where(user =>
-                user.Id == _currentUser.Id &&
-                user.Balance <= MaximumOperationAmount - request.Amount)
+        var updatedRows = await _context.BankAccountItems
+            .Where(account =>
+                account.Id == _currentUser.Id &&
+                account.Balance <= MaximumOperationAmount - request.Amount)
             .ExecuteUpdateAsync(setters => setters.SetProperty(
-                user => user.Balance,
-                user => user.Balance + request.Amount));
+                account => account.Balance,
+                account => account.Balance + request.Amount));
 
         if (updatedRows == 0)
         {
-            if (!await _context.Users.AnyAsync(user => user.Id == _currentUser.Id))
+            if (!await _context.BankAccountItems.AnyAsync(account => account.Id == _currentUser.Id))
             {
                 throw new UnauthorizedException(
                     "The user associated with this token no longer exists.");
@@ -57,17 +57,17 @@ public sealed class BalanceService : IBalanceService
     {
         ValidateAmount(request.Amount);
 
-        var updatedRows = await _context.Users
-            .Where(user =>
-                user.Id == _currentUser.Id &&
-                user.Balance >= request.Amount)
+        var updatedRows = await _context.BankAccountItems
+            .Where(account =>
+                account.Id == _currentUser.Id &&
+                account.Balance >= request.Amount)
             .ExecuteUpdateAsync(setters => setters.SetProperty(
-                user => user.Balance,
-                user => user.Balance - request.Amount));
+                account => account.Balance,
+                account => account.Balance - request.Amount));
 
         if (updatedRows == 0)
         {
-            if (!await _context.Users.AnyAsync(user => user.Id == _currentUser.Id))
+            if (!await _context.BankAccountItems.AnyAsync(account => account.Id == _currentUser.Id))
             {
                 throw new UnauthorizedException("The user associated with this token no longer exists.");
             }
@@ -83,9 +83,9 @@ public sealed class BalanceService : IBalanceService
 
     private async Task<decimal> GetCurrentBalance()
     {
-        var balance = await _context.Users
-            .Where(user => user.Id == _currentUser.Id)
-            .Select(user => (decimal?)user.Balance)
+        var balance = await _context.BankAccountItems
+            .Where(account => account.Id == _currentUser.Id)
+            .Select(account => (decimal?)account.Balance)
             .SingleOrDefaultAsync();
 
         return balance
