@@ -1,38 +1,49 @@
-# Bank Account API
+# Bank Account Simulator
 
-## JWT configuration
+A small ASP.NET Core API that simulates bank account registration, JWT login, balance viewing, deposits, and withdrawals. Passwords are hashed and finance endpoints require authentication.
 
-The JWT signing secret is intentionally not stored in source control. Configure a secret of at least 32 characters before starting the API:
+## Setup
+
+The project keeps secrets outside source control. From the project directory, configure both the PostgreSQL connection string and a JWT signing secret:
 
 ```bash
+dotnet user-secrets set "BankAccountContext:connectionString" "Host=localhost;Port=5432;Database=bankdb;Username=postgres;Password=YOUR_PASSWORD"
+
 dotnet user-secrets set "Jwt:Secret" "replace-with-a-random-secret-at-least-32-characters"
 ```
 
-Alternatively, set the environment variable `Jwt__Secret`.
-
-Apply database migrations:
+Make sure PostgreSQL is running, then apply migrations:
 
 ```bash
 dotnet ef database update
 ```
 
-## Authentication flow
+Start the API:
 
-1. Register with `POST /api/auth/register`.
-2. Log in with `POST /api/auth/login`.
-3. Copy `accessToken` from the response.
-4. In Swagger UI, click **Authorize** and enter the token. Swagger adds the `Bearer` prefix automatically.
-5. Call an endpoint under `/api/BankAccountItems`.
+```bash
+dotnet run --launch-profile https
+```
 
-The authentication endpoints are public. All bank-account endpoints require a valid JWT and return `401 Unauthorized` without one.
+## Swagger UI
 
-Passwords are hashed with ASP.NET Core `PasswordHasher<TUser>` and only the resulting hash is stored.
+While the application is running in Development, open:
 
-## Further reading
+- https://localhost:7010/swagger
+- or http://localhost:5062/swagger when using the HTTP profile
 
-- JWT: https://jwt.io/introduction
-- ASP.NET Core authentication: https://learn.microsoft.com/aspnet/core/security/authentication/
-- ASP.NET Core authorization: https://learn.microsoft.com/aspnet/core/security/authorization/introduction
-- JWT Bearer authentication: https://learn.microsoft.com/aspnet/core/security/authentication/configure-jwt-bearer-authentication
-- Middleware: https://learn.microsoft.com/aspnet/core/fundamentals/middleware/
-- Password hashing: https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.identity.passwordhasher-1
+Register with `POST /api/auth/register`. The response contains the generated account `id`. Use that ID and the password with `POST /api/auth/login`.
+
+To call protected endpoints:
+
+1. Copy `accessToken` from the login response.
+2. Click **Authorize** in Swagger.
+3. Paste only the token, without writing `Bearer` yourself.
+4. Call the balance or bank-account endpoints.
+
+## Tests
+
+Run the unit tests with:
+
+```bash
+dotnet test BankAccountApi.Tests/BankAccountApi.Tests.csproj
+```
